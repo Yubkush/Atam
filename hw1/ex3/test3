@@ -1,0 +1,22 @@
+.global _start
+
+.section .text
+
+  mov $mergedArray, %rax
+  cmpl $0, (%rax)
+  jne bad_exit
+  
+
+  movq $60, %rax
+  movq $0, %rdi
+  syscall
+
+bad_exit:
+  movq $60, %rax
+  movq $1, %rdi
+  syscall
+
+.section .data
+array1: .int 0
+array2: .int 0
+mergedArray: .zero 20
