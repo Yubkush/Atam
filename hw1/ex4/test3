@@ -1,0 +1,22 @@
+.global _start
+
+.section .text
+
+  mov root, %rax
+  cmpl $9, (%rax)
+  jne bad_exit
+
+  movq $60, %rax
+  movq $0, %rdi
+  syscall
+
+bad_exit:
+  movq $60, %rax
+  movq $1, %rdi
+  syscall
+
+.section .data
+new_node: .quad 9, 0, 0
+root:
+ .quad 0
+ 
