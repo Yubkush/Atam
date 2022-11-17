@@ -1,0 +1,51 @@
+.global _start
+
+.section .text
+
+woah:
+  # check head
+  movq head, %rax
+  cmpq $A, %rax
+  jne bad_exit
+  # check node2
+  movq 4(%rax), %rax
+  cmpq $B, %rax
+  jne bad_exit
+
+  # check node3 id
+  movq 4(%rax), %rax
+  cmpq $C, %rax
+  jne bad_exit
+
+  # check node4 id
+  movq 4(%rax), %rax
+  cmpq $D, %rax
+  jne bad_exit
+
+  movq 4(%rax), %rax
+  cmpq $0, %rax
+  jne bad_exit
+
+
+  
+
+  movq $60, %rax
+  movq $0, %rdi
+  syscall
+
+bad_exit:
+  movq $60, %rax
+  movq $1, %rdi
+  syscall
+
+.section .data
+head: .quad A
+Value: .int 6
+D:  .int 1
+    .quad 0
+C:  .int 6
+    .quad D
+B:  .int 5
+    .quad C
+A:  .int 4
+    .quad B
