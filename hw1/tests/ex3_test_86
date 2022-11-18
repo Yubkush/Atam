@@ -1,0 +1,77 @@
+.global _start
+
+.section .text
+    mov $mergedArray, %rax
+    cmpl $4040012495, 0(%rax)
+    jne bad_exit
+
+    cmpl $3354913412, 4(%rax)
+    jne bad_exit
+
+    cmpl $3352653371, 8(%rax)
+    jne bad_exit
+
+    cmpl $3184630236, 12(%rax)
+    jne bad_exit
+
+    cmpl $3172616360, 16(%rax)
+    jne bad_exit
+
+    cmpl $3085546218, 20(%rax)
+    jne bad_exit
+
+    cmpl $2984885531, 24(%rax)
+    jne bad_exit
+
+    cmpl $2542907480, 28(%rax)
+    jne bad_exit
+
+    cmpl $2376632064, 32(%rax)
+    jne bad_exit
+
+    cmpl $1765594625, 36(%rax)
+    jne bad_exit
+
+    cmpl $1688861707, 40(%rax)
+    jne bad_exit
+
+    cmpl $1462500814, 44(%rax)
+    jne bad_exit
+
+    cmpl $1094180636, 48(%rax)
+    jne bad_exit
+
+    cmpl $993622296, 52(%rax)
+    jne bad_exit
+
+    cmpl $734151866, 56(%rax)
+    jne bad_exit
+
+    cmpl $566887528, 60(%rax)
+    jne bad_exit
+
+    cmpl $413133062, 64(%rax)
+    jne bad_exit
+
+    cmpl $288370814, 68(%rax)
+    jne bad_exit
+
+    cmpl $188836000, 72(%rax)
+    jne bad_exit
+
+    cmpl $0, 76(%rax)
+    jne bad_exit
+
+    movq $60, %rax
+    movq $0, %rdi
+    syscall
+
+bad_exit:
+    movq $60, %rax
+    movq $1, %rdi
+    syscall
+
+.section .data
+array1: .int 4040012495,3354913412,3352653371,3172616360,3085546218,2984885531,2542907480,2376632064,1765594625,1688861707,1462500814,993622296,734151866,566887528,0
+array2: .int 3184630236,1094180636,413133062,288370814,188836000,0
+mergedArray: .zero 80

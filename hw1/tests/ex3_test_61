@@ -1,0 +1,125 @@
+.global _start
+
+.section .text
+    mov $mergedArray, %rax
+    cmpl $4241703596, 0(%rax)
+    jne bad_exit
+
+    cmpl $4192909158, 4(%rax)
+    jne bad_exit
+
+    cmpl $3965648053, 8(%rax)
+    jne bad_exit
+
+    cmpl $3771927887, 12(%rax)
+    jne bad_exit
+
+    cmpl $3729616526, 16(%rax)
+    jne bad_exit
+
+    cmpl $3627056509, 20(%rax)
+    jne bad_exit
+
+    cmpl $3581647531, 24(%rax)
+    jne bad_exit
+
+    cmpl $3579835892, 28(%rax)
+    jne bad_exit
+
+    cmpl $3546988918, 32(%rax)
+    jne bad_exit
+
+    cmpl $3521389842, 36(%rax)
+    jne bad_exit
+
+    cmpl $3465790575, 40(%rax)
+    jne bad_exit
+
+    cmpl $3417857882, 44(%rax)
+    jne bad_exit
+
+    cmpl $3072324745, 48(%rax)
+    jne bad_exit
+
+    cmpl $2975351311, 52(%rax)
+    jne bad_exit
+
+    cmpl $2791314812, 56(%rax)
+    jne bad_exit
+
+    cmpl $2662099951, 60(%rax)
+    jne bad_exit
+
+    cmpl $2660428747, 64(%rax)
+    jne bad_exit
+
+    cmpl $2520375289, 68(%rax)
+    jne bad_exit
+
+    cmpl $2301373861, 72(%rax)
+    jne bad_exit
+
+    cmpl $1921441002, 76(%rax)
+    jne bad_exit
+
+    cmpl $1843298477, 80(%rax)
+    jne bad_exit
+
+    cmpl $1713948851, 84(%rax)
+    jne bad_exit
+
+    cmpl $1639101665, 88(%rax)
+    jne bad_exit
+
+    cmpl $1583432683, 92(%rax)
+    jne bad_exit
+
+    cmpl $1436436930, 96(%rax)
+    jne bad_exit
+
+    cmpl $1411363481, 100(%rax)
+    jne bad_exit
+
+    cmpl $1330221912, 104(%rax)
+    jne bad_exit
+
+    cmpl $1312268939, 108(%rax)
+    jne bad_exit
+
+    cmpl $1159325428, 112(%rax)
+    jne bad_exit
+
+    cmpl $1063339620, 116(%rax)
+    jne bad_exit
+
+    cmpl $886262650, 120(%rax)
+    jne bad_exit
+
+    cmpl $449305931, 124(%rax)
+    jne bad_exit
+
+    cmpl $306637007, 128(%rax)
+    jne bad_exit
+
+    cmpl $105132705, 132(%rax)
+    jne bad_exit
+
+    cmpl $61410067, 136(%rax)
+    jne bad_exit
+
+    cmpl $0, 140(%rax)
+    jne bad_exit
+
+    movq $60, %rax
+    movq $0, %rdi
+    syscall
+
+bad_exit:
+    movq $60, %rax
+    movq $1, %rdi
+    syscall
+
+.section .data
+array1: .int 3581647531,3546988918,3521389842,3465790575,3417857882,2791314812,2662099951,2660428747,1583432683,1436436930,1312268939,1159325428,61410067,0
+array2: .int 4241703596,4192909158,3965648053,3771927887,3729616526,3627056509,3579835892,3072324745,2975351311,2520375289,2301373861,1921441002,1843298477,1713948851,1639101665,1411363481,1330221912,1063339620,886262650,449305931,306637007,105132705,0
+mergedArray: .zero 144
