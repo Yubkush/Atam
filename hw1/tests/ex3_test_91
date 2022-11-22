@@ -2,166 +2,64 @@
 
 .section .text
     mov $mergedArray, %rax
-    cmpl $4186741669, 0(%rax)
+    cmpl $30, 0(%rax)
     jne bad_exit
 
-    cmpl $4138852782, 4(%rax)
+    cmpl $29, 4(%rax)
     jne bad_exit
 
-    cmpl $4037615246, 8(%rax)
+    cmpl $28, 8(%rax)
     jne bad_exit
 
-    cmpl $3937113467, 12(%rax)
+    cmpl $24, 12(%rax)
     jne bad_exit
 
-    cmpl $3888386288, 16(%rax)
+    cmpl $22, 16(%rax)
     jne bad_exit
 
-    cmpl $3592181287, 20(%rax)
+    cmpl $20, 20(%rax)
     jne bad_exit
 
-    cmpl $3545712817, 24(%rax)
+    cmpl $19, 24(%rax)
     jne bad_exit
 
-    cmpl $3537087262, 28(%rax)
+    cmpl $18, 28(%rax)
     jne bad_exit
 
-    cmpl $3532606695, 32(%rax)
+    cmpl $16, 32(%rax)
     jne bad_exit
 
-    cmpl $3400778104, 36(%rax)
+    cmpl $15, 36(%rax)
     jne bad_exit
 
-    cmpl $3349107003, 40(%rax)
+    cmpl $14, 40(%rax)
     jne bad_exit
 
-    cmpl $3312019272, 44(%rax)
+    cmpl $13, 44(%rax)
     jne bad_exit
 
-    cmpl $3210346872, 48(%rax)
+    cmpl $12, 48(%rax)
     jne bad_exit
 
-    cmpl $3155262935, 52(%rax)
+    cmpl $7, 52(%rax)
     jne bad_exit
 
-    cmpl $3037349911, 56(%rax)
+    cmpl $6, 56(%rax)
     jne bad_exit
 
-    cmpl $2961901297, 60(%rax)
+    cmpl $5, 60(%rax)
     jne bad_exit
 
-    cmpl $2939082980, 64(%rax)
+    cmpl $4, 64(%rax)
     jne bad_exit
 
-    cmpl $2925672303, 68(%rax)
+    cmpl $2, 68(%rax)
     jne bad_exit
 
-    cmpl $2840070050, 72(%rax)
+    cmpl $1, 72(%rax)
     jne bad_exit
 
-    cmpl $2731778629, 76(%rax)
-    jne bad_exit
-
-    cmpl $2690895112, 80(%rax)
-    jne bad_exit
-
-    cmpl $2642597833, 84(%rax)
-    jne bad_exit
-
-    cmpl $2627857237, 88(%rax)
-    jne bad_exit
-
-    cmpl $2584746866, 92(%rax)
-    jne bad_exit
-
-    cmpl $2463809249, 96(%rax)
-    jne bad_exit
-
-    cmpl $2243066728, 100(%rax)
-    jne bad_exit
-
-    cmpl $2172276662, 104(%rax)
-    jne bad_exit
-
-    cmpl $2161639073, 108(%rax)
-    jne bad_exit
-
-    cmpl $1998649532, 112(%rax)
-    jne bad_exit
-
-    cmpl $1967861743, 116(%rax)
-    jne bad_exit
-
-    cmpl $1944514817, 120(%rax)
-    jne bad_exit
-
-    cmpl $1909994612, 124(%rax)
-    jne bad_exit
-
-    cmpl $1833494265, 128(%rax)
-    jne bad_exit
-
-    cmpl $1778967461, 132(%rax)
-    jne bad_exit
-
-    cmpl $1721565861, 136(%rax)
-    jne bad_exit
-
-    cmpl $1604437694, 140(%rax)
-    jne bad_exit
-
-    cmpl $1466870831, 144(%rax)
-    jne bad_exit
-
-    cmpl $1453584905, 148(%rax)
-    jne bad_exit
-
-    cmpl $1374829849, 152(%rax)
-    jne bad_exit
-
-    cmpl $1372854076, 156(%rax)
-    jne bad_exit
-
-    cmpl $1202756952, 160(%rax)
-    jne bad_exit
-
-    cmpl $1051466809, 164(%rax)
-    jne bad_exit
-
-    cmpl $1025883024, 168(%rax)
-    jne bad_exit
-
-    cmpl $948761686, 172(%rax)
-    jne bad_exit
-
-    cmpl $883868112, 176(%rax)
-    jne bad_exit
-
-    cmpl $791207097, 180(%rax)
-    jne bad_exit
-
-    cmpl $595099989, 184(%rax)
-    jne bad_exit
-
-    cmpl $481810145, 188(%rax)
-    jne bad_exit
-
-    cmpl $211693226, 192(%rax)
-    jne bad_exit
-
-    cmpl $180319481, 196(%rax)
-    jne bad_exit
-
-    cmpl $178614423, 200(%rax)
-    jne bad_exit
-
-    cmpl $27473556, 204(%rax)
-    jne bad_exit
-
-    cmpl $26248459, 208(%rax)
-    jne bad_exit
-
-    cmpl $0, 212(%rax)
+    cmpl $0, 76(%rax)
     jne bad_exit
 
     movq $60, %rax
@@ -174,6 +72,7 @@ bad_exit:
     syscall
 
 .section .data
-array1: .int 4186741669,3592181287,3545712817,3400778104,3349107003,3155262935,3037349911,2961901297,2939082980,2925672303,2840070050,2731778629,2161639073,1998649532,1967861743,1909994612,1466870831,1453584905,1372854076,1202756952,948761686,883868112,791207097,481810145,180319481,178614423,27473556,26248459,0
-array2: .int 4138852782,4037615246,3937113467,3888386288,3537087262,3532606695,3312019272,3210346872,2690895112,2642597833,2627857237,2584746866,2463809249,2243066728,2172276662,1944514817,1833494265,1778967461,1721565861,1604437694,1374829849,1051466809,1025883024,595099989,211693226,0
-mergedArray: .zero 216
+array1: .int 30,30,28,22,22,19,18,18,16,14,13,7,7,7,6,5,2,2,0
+array2: .int 30,29,24,20,15,14,12,4,4,4,2,2,1,1,0
+mergedArray: .zero 132
+

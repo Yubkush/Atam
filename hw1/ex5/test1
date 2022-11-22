@@ -8,21 +8,21 @@ woah:
   cmpq $A, %rax
   jne bad_exit
   # check node2
-  movq 4(%rax), %rax
+  movq 8(%rax), %rax
   cmpq $C, %rax
   jne bad_exit
 
   # check node3 id
-  movq 4(%rax), %rax
+  movq 8(%rax), %rax
   cmpq $B, %rax
   jne bad_exit
 
   # check node4 id
-  movq 4(%rax), %rax
+  movq 8(%rax), %rax
   cmpq $D, %rax
   jne bad_exit
 
-  movq 4(%rax), %rax
+  movq 8(%rax), %rax
   cmpq $0, %rax
   jne bad_exit
 
@@ -40,12 +40,12 @@ bad_exit:
 
 .section .data
 head: .quad A
-Value: .int 6
-D:  .int 1
+val: .int 6
+D:  .quad 1
     .quad 0
-C:  .int 6
+C:  .quad 6
     .quad D
-B:  .int 6
+B:  .quad 6
     .quad C
-A:  .int 4
+A:  .quad 4
     .quad B

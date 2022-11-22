@@ -2,34 +2,70 @@
 
 .section .text
     mov $mergedArray, %rax
-    cmpl $4070289688, 0(%rax)
+    cmpl $29, 0(%rax)
     jne bad_exit
 
-    cmpl $3521568249, 4(%rax)
+    cmpl $28, 4(%rax)
     jne bad_exit
 
-    cmpl $2427770896, 8(%rax)
+    cmpl $27, 8(%rax)
     jne bad_exit
 
-    cmpl $2125537642, 12(%rax)
+    cmpl $25, 12(%rax)
     jne bad_exit
 
-    cmpl $1857733666, 16(%rax)
+    cmpl $24, 16(%rax)
     jne bad_exit
 
-    cmpl $1758866227, 20(%rax)
+    cmpl $22, 20(%rax)
     jne bad_exit
 
-    cmpl $1445745815, 24(%rax)
+    cmpl $21, 24(%rax)
     jne bad_exit
 
-    cmpl $240729230, 28(%rax)
+    cmpl $20, 28(%rax)
     jne bad_exit
 
-    cmpl $190149497, 32(%rax)
+    cmpl $19, 32(%rax)
     jne bad_exit
 
-    cmpl $0, 36(%rax)
+    cmpl $18, 36(%rax)
+    jne bad_exit
+
+    cmpl $17, 40(%rax)
+    jne bad_exit
+
+    cmpl $16, 44(%rax)
+    jne bad_exit
+
+    cmpl $12, 48(%rax)
+    jne bad_exit
+
+    cmpl $11, 52(%rax)
+    jne bad_exit
+
+    cmpl $10, 56(%rax)
+    jne bad_exit
+
+    cmpl $9, 60(%rax)
+    jne bad_exit
+
+    cmpl $8, 64(%rax)
+    jne bad_exit
+
+    cmpl $7, 68(%rax)
+    jne bad_exit
+
+    cmpl $6, 72(%rax)
+    jne bad_exit
+
+    cmpl $4, 76(%rax)
+    jne bad_exit
+
+    cmpl $1, 80(%rax)
+    jne bad_exit
+
+    cmpl $0, 84(%rax)
     jne bad_exit
 
     movq $60, %rax
@@ -42,6 +78,7 @@ bad_exit:
     syscall
 
 .section .data
-array1: .int 1758866227,0
-array2: .int 4070289688,3521568249,2427770896,2125537642,1857733666,1445745815,240729230,190149497,0
-mergedArray: .zero 40
+array1: .int 29,27,27,24,24,24,22,21,21,20,18,17,12,10,10,8,4,0
+array2: .int 28,28,25,25,25,22,22,22,21,20,20,19,17,17,16,12,11,9,8,8,7,7,6,4,4,1,1,0
+mergedArray: .zero 180
+

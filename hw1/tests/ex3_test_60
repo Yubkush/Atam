@@ -2,37 +2,28 @@
 
 .section .text
     mov $mergedArray, %rax
-    cmpl $3784980464, 0(%rax)
+    cmpl $30, 0(%rax)
     jne bad_exit
 
-    cmpl $3148589395, 4(%rax)
+    cmpl $22, 4(%rax)
     jne bad_exit
 
-    cmpl $3068860566, 8(%rax)
+    cmpl $20, 8(%rax)
     jne bad_exit
 
-    cmpl $2652488260, 12(%rax)
+    cmpl $19, 12(%rax)
     jne bad_exit
 
-    cmpl $2618328402, 16(%rax)
+    cmpl $13, 16(%rax)
     jne bad_exit
 
-    cmpl $2584252938, 20(%rax)
+    cmpl $10, 20(%rax)
     jne bad_exit
 
-    cmpl $1211042831, 24(%rax)
+    cmpl $7, 24(%rax)
     jne bad_exit
 
-    cmpl $911427097, 28(%rax)
-    jne bad_exit
-
-    cmpl $555007333, 32(%rax)
-    jne bad_exit
-
-    cmpl $179153919, 36(%rax)
-    jne bad_exit
-
-    cmpl $0, 40(%rax)
+    cmpl $0, 28(%rax)
     jne bad_exit
 
     movq $60, %rax
@@ -45,6 +36,7 @@ bad_exit:
     syscall
 
 .section .data
-array1: .int 3068860566,2584252938,911427097,0
-array2: .int 3784980464,3148589395,2652488260,2618328402,1211042831,555007333,179153919,0
-mergedArray: .zero 44
+array1: .int 22,20,19,7,0
+array2: .int 30,13,10,0
+mergedArray: .zero 32
+

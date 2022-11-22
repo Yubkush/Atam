@@ -2,106 +2,82 @@
 
 .section .text
     mov $mergedArray, %rax
-    cmpl $4206382788, 0(%rax)
+    cmpl $30, 0(%rax)
     jne bad_exit
 
-    cmpl $4064147196, 4(%rax)
+    cmpl $29, 4(%rax)
     jne bad_exit
 
-    cmpl $4039995168, 8(%rax)
+    cmpl $27, 8(%rax)
     jne bad_exit
 
-    cmpl $4015694077, 12(%rax)
+    cmpl $26, 12(%rax)
     jne bad_exit
 
-    cmpl $4012617964, 16(%rax)
+    cmpl $24, 16(%rax)
     jne bad_exit
 
-    cmpl $3949799653, 20(%rax)
+    cmpl $23, 20(%rax)
     jne bad_exit
 
-    cmpl $3776395800, 24(%rax)
+    cmpl $22, 24(%rax)
     jne bad_exit
 
-    cmpl $3714202005, 28(%rax)
+    cmpl $20, 28(%rax)
     jne bad_exit
 
-    cmpl $3392540766, 32(%rax)
+    cmpl $19, 32(%rax)
     jne bad_exit
 
-    cmpl $3296617321, 36(%rax)
+    cmpl $18, 36(%rax)
     jne bad_exit
 
-    cmpl $2906243595, 40(%rax)
+    cmpl $17, 40(%rax)
     jne bad_exit
 
-    cmpl $2819751042, 44(%rax)
+    cmpl $16, 44(%rax)
     jne bad_exit
 
-    cmpl $2811037534, 48(%rax)
+    cmpl $15, 48(%rax)
     jne bad_exit
 
-    cmpl $2636531009, 52(%rax)
+    cmpl $14, 52(%rax)
     jne bad_exit
 
-    cmpl $2566733567, 56(%rax)
+    cmpl $13, 56(%rax)
     jne bad_exit
 
-    cmpl $2461252142, 60(%rax)
+    cmpl $12, 60(%rax)
     jne bad_exit
 
-    cmpl $2340380786, 64(%rax)
+    cmpl $11, 64(%rax)
     jne bad_exit
 
-    cmpl $1873074522, 68(%rax)
+    cmpl $10, 68(%rax)
     jne bad_exit
 
-    cmpl $1589098786, 72(%rax)
+    cmpl $9, 72(%rax)
     jne bad_exit
 
-    cmpl $1499319005, 76(%rax)
+    cmpl $7, 76(%rax)
     jne bad_exit
 
-    cmpl $1440047010, 80(%rax)
+    cmpl $6, 80(%rax)
     jne bad_exit
 
-    cmpl $1425868071, 84(%rax)
+    cmpl $4, 84(%rax)
     jne bad_exit
 
-    cmpl $1346788016, 88(%rax)
+    cmpl $3, 88(%rax)
     jne bad_exit
 
-    cmpl $1342498310, 92(%rax)
+    cmpl $2, 92(%rax)
     jne bad_exit
 
-    cmpl $1102828120, 96(%rax)
+    cmpl $1, 96(%rax)
     jne bad_exit
 
-    cmpl $1070331834, 100(%rax)
-    jne bad_exit
-
-    cmpl $1060223023, 104(%rax)
-    jne bad_exit
-
-    cmpl $981306977, 108(%rax)
-    jne bad_exit
-
-    cmpl $823297199, 112(%rax)
-    jne bad_exit
-
-    cmpl $634754067, 116(%rax)
-    jne bad_exit
-
-    cmpl $594418275, 120(%rax)
-    jne bad_exit
-
-    cmpl $319854936, 124(%rax)
-    jne bad_exit
-
-    cmpl $78663596, 128(%rax)
-    jne bad_exit
-
-    cmpl $0, 132(%rax)
+    cmpl $0, 100(%rax)
     jne bad_exit
 
     movq $60, %rax
@@ -114,6 +90,7 @@ bad_exit:
     syscall
 
 .section .data
-array1: .int 4206382788,4064147196,4015694077,4012617964,3776395800,3714202005,3392540766,3296617321,2906243595,2819751042,2566733567,2461252142,1499319005,1425868071,1346788016,1342498310,1060223023,981306977,823297199,594418275,78663596,0
-array2: .int 4039995168,3949799653,2811037534,2636531009,2340380786,1873074522,1589098786,1440047010,1102828120,1070331834,634754067,319854936,0
-mergedArray: .zero 136
+array1: .int 30,30,29,27,27,26,24,24,23,23,22,20,19,16,15,15,13,12,12,11,11,9,9,4,2,1,0
+array2: .int 24,24,22,22,22,20,18,17,17,17,17,15,14,12,10,9,7,6,3,1,0
+mergedArray: .zero 188
+

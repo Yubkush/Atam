@@ -7,21 +7,21 @@ movq (head), %rax # rax is node* tmp
 movq $head, %rbx # father of tmp
 cmpq $0, %rax 
 je end_HW1
-movl Value, %r8d
+movl val, %r8d
 movb $0, %cl # bool if we need to swap head node
 
 # while loop to find two nodes with value
-movl (%rax), %r9d # tmp value
-cmpl %r8d, %r9d
+movq (%rax), %r9 # tmp value
+cmpq %r8, %r9
 je swap_root_HW1
 loop1_HW1:
   testq %rax, %rax # check if tmp is null
   jz end_HW1
-  movl (%rax), %r9d # tmp value
-  cmpl %r8d, %r9d
+  movq (%rax), %r9 # tmp value
+  cmpq %r8, %r9
   je find1_HW1
   movq %rax, %rbx # father = father.next
-  movq 4(%rax), %rax # tmp = tmp.next
+  movq 8(%rax), %rax # tmp = tmp.next
   jmp loop1_HW1
   
 # r10 is node1 father, r11 is node1
@@ -33,11 +33,11 @@ find1_HW1:
 
 loop2_HW1:
   movq %rax, %rbx # father = father.next
-  movq 4(%rax), %rax # tmp = tmp.next
+  movq 8(%rax), %rax # tmp = tmp.next
   testq %rax, %rax # check if tmp is null
   jz end_HW1
-  movl (%rax), %r9d # tmp value
-  cmpl %r8d, %r9d
+  movq (%rax), %r9 # tmp value
+  cmpq %r8, %r9
   je find2_HW1
   jmp loop2_HW1
 
@@ -47,11 +47,11 @@ find2_HW1:
   movq %rax, %r13
 
 loop3_HW1:
-  movq 4(%rax), %rax # tmp = tmp.next
+  movq 8(%rax), %rax # tmp = tmp.next
   testq %rax, %rax # check if tmp is null
   jz swap_HW1
-  movl (%rax), %r9d # tmp value
-  cmpl %r8d, %r9d
+  movq (%rax), %r9 # tmp value
+  cmpq %r8, %r9
   je end_HW1
   jmp loop3_HW1
   
@@ -62,26 +62,26 @@ swap_HW1:
   # swap head
   # swap fathers pointers
   movq (head), %r14
-  movq 4(%r12), %r15
-  movq %r14, 4(%r12)
+  movq 8(%r12), %r15
+  movq %r14, 8(%r12)
   movq %r15, (head)
   # swap child pointers
-  movq 4(%r11), %r14
-  movq 4(%r13), %r15
-  movq %r14, 4(%r13)
-  movq %r15, 4(%r11)
+  movq 8(%r11), %r14
+  movq 8(%r13), %r15
+  movq %r14, 8(%r13)
+  movq %r15, 8(%r11)
   jmp end_HW1
 
 regular_swap_HW1:
   # swap fathers pointers
-  movq 4(%r10), %r14
-  movq 4(%r12), %r15
-  movq %r14, 4(%r12)
-  movq %r15, 4(%r10)
+  movq 8(%r10), %r14
+  movq 8(%r12), %r15
+  movq %r14, 8(%r12)
+  movq %r15, 8(%r10)
   # swap child pointers
-  movq 4(%r11), %r14
-  movq 4(%r13), %r15
-  movq %r14, 4(%r13)
-  movq %r15, 4(%r11)
+  movq 8(%r11), %r14
+  movq 8(%r13), %r15
+  movq %r14, 8(%r13)
+  movq %r15, 8(%r11)
 
 end_HW1:
