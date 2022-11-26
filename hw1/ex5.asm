@@ -7,7 +7,7 @@ movq (head), %rax # rax is node* tmp
 movq $head, %rbx # father of tmp
 cmpq $0, %rax 
 je end_HW1
-movl val, %r8d
+movslq val, %r8
 movb $0, %cl # bool if we need to swap head node
 
 # while loop to find two nodes with value

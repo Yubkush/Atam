@@ -6,6 +6,8 @@ _start:
   movq $0x0, %rdi # dest index
   movq $0x0, %rsi # src index
   movl (num), %eax # RAX = n
+  testl %eax, %eax
+  jz end_HW1
   # check if num is negative
   cdq
   testl %edx, %edx
