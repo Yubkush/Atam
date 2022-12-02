@@ -47,6 +47,7 @@ count_above:
       cmpb $45, (%rsi) # if we get '-' (negative num)
       jne positive
       movq $1, %r15
+      jmp read_single_number
       
       positive:
         incq %rsi
@@ -63,6 +64,7 @@ count_above:
     popq %rdi # get file descriptor back
     
     # iff we got negative number change it with 2 complement
+    here:
     cmpq $1, %r15
     jne compare
     notq %rax
