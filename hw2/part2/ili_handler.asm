@@ -13,7 +13,7 @@ my_ili_handler:
   movq 16(%rsp), %rbx # instruction pointer
   movq (%rbx), %rbx # get opcode from pointer
   # check if opcode is 1 byte(not starts with 0F)
-  cmpb %bl, $0x0F
+  cmpb $0x0F, %bl
   jne last_byte
   incq %r12
   sarq $8, %rbx
