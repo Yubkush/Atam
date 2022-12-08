@@ -16,7 +16,7 @@ my_ili_handler:
   cmpb $0x0F, %bl
   jne last_byte
   incq %r12
-  sarq $8, %rbx
+  ; shrq $8, %rbx
   
   last_byte:
   pushq %rax
@@ -31,7 +31,7 @@ my_ili_handler:
   popq %rax
   popq %r12
   popq %rbx
-  jmp old_ili_handler
+  jmp *old_ili_handler
 
   return_back:
     movq %rax, %rdi
