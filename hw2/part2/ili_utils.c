@@ -2,7 +2,7 @@
 
 // TO_DO: store the address of the IDT at the parameter given
 void my_store_idt(struct desc_ptr *idtr) {
-    asm ("sidt %0;"
+    asm volatile("sidt %0;"
         :"=m"(*idtr)  // output
         :
         :   // clobbered registers
@@ -11,7 +11,7 @@ void my_store_idt(struct desc_ptr *idtr) {
 
 // TO_DO: load the address of the IDT from the parameter given
 void my_load_idt(struct desc_ptr *idtr) {
-    asm ("lidt %0;"
+    asm volatile("lidt %0;"
         :   // output
         :"m"(*idtr)
         :   // clobbered registers
