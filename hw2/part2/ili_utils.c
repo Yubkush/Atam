@@ -24,15 +24,6 @@ void my_set_gate_offset(gate_desc *gate, unsigned long addr) {
     gate->offset_low = addr;
     gate->offset_middle = addr >> 16;
     gate->offset_high = addr >> 32;
-    // asm ("movw %%bx, (%1);"
-    //       "sar $16, %%rbx;"
-    //       "movw %%bx, 6(%1);"
-    //       "sar $16, %%rbx;"
-    //       "movl %%ebx, 8(%1);"
-    //     :"+b"(addr)// output
-    //     :"g"(gate)
-    //     :"rbx"   // clobbered registers
-    //     );
 }
 
 // TO_DO: return val is the address stored at the parameter gate_desc gate
@@ -43,18 +34,4 @@ unsigned long my_get_gate_offset(gate_desc *gate) {
     addr += gate->offset_middle;
     addr = addr << 16;
     return addr + gate->offset_low;
-
-    // unsigned long addr = 0;
-    // asm ("movl 8(%1), %%ebx;"
-    //       "shl $16, %%rbx;"
-    //       "movw 6(%1), %%bx;"
-    //       "shl $16, %%rbx;"
-    //       "movw (%1), %%bx;"
-    //       "movq %%rbx, %0"
-    //     :"+r"(addr)   // output
-    //     :"g"(gate) // input
-    //     :"rbx"   // clobbered registers
-    //     );
-    
-    return addr;
 }

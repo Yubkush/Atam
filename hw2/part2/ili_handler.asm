@@ -16,7 +16,6 @@ my_ili_handler:
   cmpb $0x0F, %bl
   jne last_byte
   incq %r12
-  ; shrq $8, %rbx
   
   last_byte:
   pushq %rax
