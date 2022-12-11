@@ -8,7 +8,7 @@ my_ili_handler:
   pushq %rbx # opcode last byte
   pushq %r12 # opcode 2 bytes flag
   pushq %r13 # opcode byte extension
-  # restart r12
+  # restart r12, r13
   movq $0, %r12
   movq $0, %r13
   # get rip
