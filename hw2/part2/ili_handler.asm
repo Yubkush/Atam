@@ -5,15 +5,21 @@
 .align 4, 0x90
 my_ili_handler:
   # back up used registers
-  pushq %rbx
+  pushq %rbx # opcode last byte
   pushq %r12 # opcode 2 bytes flag
+  pushq %r13 # opcode byte extension
   # restart r12
   movq $0, %r12
+  movq $0, %r13
   # get rip
-  movq 16(%rsp), %rbx # instruction pointer
+  movq 24(%rsp), %rbx # instruction pointer
   movq (%rbx), %rbx # get opcode from pointer
+  movq %rbx, %r13
+  shrq $8, %r13
+  andq $0xFF, %rbx
+  
   # check if opcode is 1 byte(not starts with 0F)
-  cmpb $0x0F, %bl
+  cmpw $0x0F, %r13w
   jne last_byte
   incq %r12
   
@@ -28,6 +34,7 @@ my_ili_handler:
   jnz return_back
   # check if rax = 0
   popq %rax
+  popq %r13
   popq %r12
   popq %rbx
   jmp *old_ili_handler
@@ -35,9 +42,10 @@ my_ili_handler:
   return_back:
     movq %rax, %rdi
     incq %r12
-    addq %r12, 24(%rsp) # 24(rsp) = rip
+    addq %r12, 32(%rsp) # 32(rsp) = rip
 
   popq %rax
+  popq %r13
   popq %r12
   popq %rbx
   iretq
