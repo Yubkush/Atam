@@ -14,16 +14,20 @@ my_ili_handler:
   movq (%rbx), %rbx # get opcode from pointer
   
   # check if opcode is 1 byte(not starts with 0F)
-  cmpb $0x0F, %bl
-  jne last_byte
-  incq %r12
-  
-  last_byte:
   pushq %rax
   pushq %rdi
   xorq %rdi, %rdi
   xorq %rax, %rax
+  cmpb $0x0F, %bl
+  jne last_byte
+  # two byte opcode
+  incq %r12
   movb %bh, %al
+  jmp what_to_do_label
+  
+  last_byte:
+  movb %bl, %al
+  what_to_do_label:
   movq %rax, %rdi # prepare parameter for what_to_do
   call what_to_do
   popq %rdi
