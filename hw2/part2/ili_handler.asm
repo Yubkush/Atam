@@ -5,28 +5,26 @@
 .align 4, 0x90
 my_ili_handler:
   # back up used registers
-  pushq %rbx # opcode last byte
+  pushq %rbx # opcode
   pushq %r12 # opcode 2 bytes flag
-  pushq %r13 # opcode byte extension
-  # restart r12, r13
+  # restart r12
   movq $0, %r12
-  movq $0, %r13
   # get rip
-  movq 24(%rsp), %rbx # instruction pointer
+  movq 16(%rsp), %rbx # instruction pointer
   movq (%rbx), %rbx # get opcode from pointer
-  movq %rbx, %r13 # put opcode in r13
-  shrq $8, %r13 # get rid of last byte, left with 00 or 0F if two byte opcode
-  andq $0xFF, %rbx # get only the last byte
   
   # check if opcode is 1 byte(not starts with 0F)
-  cmpw $0x0F, %r13w
+  cmpb $0x0F, %bl
   jne last_byte
   incq %r12
   
   last_byte:
   pushq %rax
   pushq %rdi
-  movq %rbx, %rdi # prepare parameter for what_to_do
+  xorq %rdi, %rdi
+  xorq %rax, %rax
+  movb %bh, %al
+  movq %rax, %rdi # prepare parameter for what_to_do
   call what_to_do
   popq %rdi
   # check return value
@@ -34,7 +32,6 @@ my_ili_handler:
   jnz return_back
   # check if rax = 0
   popq %rax
-  popq %r13
   popq %r12
   popq %rbx
   jmp *old_ili_handler
@@ -42,10 +39,9 @@ my_ili_handler:
   return_back:
     movq %rax, %rdi
     incq %r12
-    addq %r12, 32(%rsp) # 32(rsp) = rip
+    addq %r12, 24(%rsp) # 24(rsp) = rip
 
   popq %rax
-  popq %r13
   popq %r12
   popq %rbx
   iretq
