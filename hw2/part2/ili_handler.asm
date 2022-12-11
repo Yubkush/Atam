@@ -14,9 +14,9 @@ my_ili_handler:
   # get rip
   movq 24(%rsp), %rbx # instruction pointer
   movq (%rbx), %rbx # get opcode from pointer
-  movq %rbx, %r13
-  shrq $8, %r13
-  andq $0xFF, %rbx
+  movq %rbx, %r13 # put opcode in r13
+  shrq $8, %r13 # get rid of last byte, left with 00 or 0F if two byte opcode
+  andq $0xFF, %rbx # get only the last byte
   
   # check if opcode is 1 byte(not starts with 0F)
   cmpw $0x0F, %r13w
