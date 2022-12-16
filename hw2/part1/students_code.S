@@ -55,7 +55,6 @@ count_above:
 
     last_number:
       movq $0, %r12
-      incq %rsi
     not_last:
     movq $0, (%rsi) # convert to null terminated string
     pushq %rdi # prepare for atam_atol
