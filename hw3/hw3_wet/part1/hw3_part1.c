@@ -23,23 +23,21 @@
 
 #define SYMTAB 0x2
 
-/**
- * @brief Finds the symbol table section header and places it in symbol_table.
- * 
- * @param elf_header - header of file.
- * @param symbol_table - symbol table pointer.
- * @param exe_file_name - name of elf file.
- */
-void findSymbolTable(Elf64_Ehdr *elf_header, Elf64_Shdr *symbol_table, Elf64_Shdr *section_headers) {
-	for (int i = 0; i < elf_header->e_shnum; i++) {
-		if(section_headers[i].sh_type == SYMTAB) {
-			*symbol_table = section_headers[i];
-			return;
-		}
-	}
-}
+#define STB_GLOBAL 1
 
-bool findSymbolEntry(Elf64_Ehdr *elf_header, Elf64_Sym *symbol_entry, char* exe_file_name, char *symbol_name) {
+/**
+ * @brief Find symbol entry with the name symbol_name in symbol table. 
+ * 
+ * @param elf_header - Elf file header.
+ * @param symbol_entry - Result symbol entry.
+ * @param exe_file_name - Elf file name.
+ * @param symbol_name - Name of symbol
+ * 
+ * @return 1 - Found global symbol.\
+ * @return -1 - Symbol not found.\
+ * @return -2 - No global symbol found, only local.
+ */
+int findSymbolEntry(Elf64_Ehdr *elf_header, Elf64_Sym *symbol_entry, char* exe_file_name, char *symbol_name) {
 	FILE *fp = fopen(exe_file_name, "r");
 	// prepare section headers
 	Elf64_Shdr sections[elf_header->e_shnum];
@@ -61,20 +59,28 @@ bool findSymbolEntry(Elf64_Ehdr *elf_header, Elf64_Sym *symbol_entry, char* exe_
 			fread(strtab_strings, 1, strtab.sh_size, fp);
 			fclose(fp);
 			char *strings = strtab_strings;
+			bool find_local_symbol_name = false;
 			// iterate over symbol names and compare to symbol_name
 			for (int i = 0; i < symbol_num; i++) {
 				// if current string is the symbol name
 				if(strcmp(strings + symbols[i].st_name, symbol_name) == 0) {
 					*symbol_entry = symbols[i];
-					free(strtab_strings);
-					return true;
+					unsigned char bind = ELF64_ST_BIND(symbol_entry->st_info);
+					if(bind == STB_GLOBAL) {
+						free(strtab_strings);
+						return 1;
+					}
+					find_local_symbol_name = true;
 				}
 			}
 			free(strtab_strings);
-			return false;	
+			if(find_local_symbol_name) {
+				return -2;
+			}
+			return -1;	
 		}
 	}
-	return false;
+	return -1;
 }
 
 
@@ -99,7 +105,7 @@ unsigned long find_symbol(char* symbol_name, char* exe_file_name, int* error_val
     }
 	
 	Elf64_Sym symbol_entry;
-	bool found = findSymbolEntry(&elf_header, &symbol_entry, exe_file_name, symbol_name);
+	int res = findSymbolEntry(&elf_header, &symbol_entry, exe_file_name, symbol_name);
     return 0;
 }
 
