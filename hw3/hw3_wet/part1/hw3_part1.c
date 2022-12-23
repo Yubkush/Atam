@@ -25,6 +25,8 @@
 
 #define STB_GLOBAL 1
 
+#define SHN_UNDEF 0
+
 /**
  * @brief Find symbol entry with the name symbol_name in symbol table. 
  * 
@@ -68,6 +70,9 @@ int findSymbolEntry(Elf64_Ehdr *elf_header, Elf64_Sym *symbol_entry, char* exe_f
 					unsigned char bind = ELF64_ST_BIND(symbol_entry->st_info);
 					if(bind == STB_GLOBAL) {
 						free(strtab_strings);
+						if(symbol_entry->st_shndx == SHN_UNDEF) {
+							return -4;
+						}
 						return 1;
 					}
 					find_local_symbol_name = true;
@@ -99,14 +104,17 @@ unsigned long find_symbol(char* symbol_name, char* exe_file_name, int* error_val
 	fread(&elf_header, sizeof(uint8_t), 64, fp);
 	fclose(fp);
     // error code -3, ELF type != ET_EXEC
-	if (elf_header.e_type != ET_EXEC)
-    {
-        return -3;
+	if (elf_header.e_type != ET_EXEC) {
+        *error_val = -3;
+		return 0;
     }
 	
 	Elf64_Sym symbol_entry;
-	int res = findSymbolEntry(&elf_header, &symbol_entry, exe_file_name, symbol_name);
-    return 0;
+	*error_val = findSymbolEntry(&elf_header, &symbol_entry, exe_file_name, symbol_name);
+	if(*error_val < 0) {
+		return 0;
+	}
+    return (unsigned long)symbol_entry.st_value;
 }
 
 int main(int argc, char *const argv[]) {
