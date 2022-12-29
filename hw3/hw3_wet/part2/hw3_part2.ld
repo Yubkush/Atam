@@ -26,7 +26,7 @@ SECTIONS
 PHDRS
 {
   text PT_LOAD AT(0x400000) FLAGS(3);
-  data_bss PT_LOAD AT(0x20000) FLAGS(4);
+  data_bss PT_LOAD AT(0x20000) FLAGS(2);
   rodata PT_LOAD AT(0x90000000) FLAGS(5);
 }
 
