@@ -63,10 +63,10 @@ int findSymbolEntry(Elf64_Ehdr *elf_header, Elf64_Sym *symbol_entry, char* exe_f
 			char *strings = strtab_strings;
 			bool find_local_symbol_name = false;
 			// iterate over symbol names and compare to symbol_name
-			for (int i = 0; i < symbol_num; i++) {
+			for (int j = 0; j < symbol_num; j++) {
 				// if current string is the symbol name
-				if(strcmp(strings + symbols[i].st_name, symbol_name) == 0) {
-					*symbol_entry = symbols[i];
+				if(strcmp(strings + symbols[j].st_name, symbol_name) == 0) {
+					*symbol_entry = symbols[j];
 					unsigned char bind = ELF64_ST_BIND(symbol_entry->st_info);
 					if(bind == STB_GLOBAL) {
 						free(strtab_strings);
