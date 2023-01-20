@@ -181,19 +181,106 @@ unsigned long find_symbol(char* symbol_name, char* exe_file_name, int* error_val
     return (unsigned long)symbol_entry.st_value;
 }
 
-int main(int argc, char *const argv[]) {
+pid_t run_target(char* argv[])
+{
+	pid_t pid;
+	pid = fork();
+	
+    if (pid > 0) {
+		return pid;
+		
+    } else if (pid == 0) {
+		/* Allow tracing of this process */
+		if (ptrace(PTRACE_TRACEME, 0, NULL, NULL) < 0) {
+			perror("ptrace");
+			exit(1);
+		}
+		/* Replace this process's image with the given program */
+		execv(argv[2], argv + 2);	
+	} 
+	return 0;
+}
+
+void run_debugger(pid_t child_pid, char *symbol_name, char *exec_name)
+{
+    int wait_status;
+    struct user_regs_struct regs;
+	int counter = 1;
+	int err = 1;
+
+    /* Wait for child to stop on its first instruction */
+    wait(&wait_status);
+
+    /* find symbol address we're interested in */
+    unsigned long addr = find_symbol(symbol_name, exec_name, &err);
+	if (err == -2) {
+		printf("PRF:: %s is not a global symbol! :(\n", symbol_name);
+		return;
+	}
+	else if (err == -1) {
+		printf("PRF:: %s not found!\n", symbol_name);
+		return;
+	}
+	unsigned long data = ptrace(PTRACE_PEEKTEXT, child_pid, (void*)addr, NULL);
+	unsigned long data_trap = (data & 0xFFFFFFFFFFFFFF00) | 0xCC;
+	// put break point at function
+	ptrace(PTRACE_POKETEXT, child_pid, (void*)addr, (void*)data_trap);
+
+	/* Let the child run to the breakpoint and wait for it to reach it */
+	ptrace(PTRACE_CONT, child_pid, NULL, NULL);
+	wait(&wait_status);
+
+	while(WIFSTOPPED(wait_status)) {
+		/* See where the child is now */
+		ptrace(PTRACE_GETREGS, child_pid, 0, &regs);
+
+		/* Remove the breakpoint by restoring the previous data */
+		ptrace(PTRACE_POKETEXT, child_pid, (void*)addr, (void*)data);
+		regs.rip -= 1;
+		ptrace(PTRACE_SETREGS, child_pid, 0, &regs);
+		// unsigned long base = regs.rsp;
+		unsigned long ret_addr = ptrace(PTRACE_PEEKTEXT, child_pid, (void*)(regs.rsp + 0x8), NULL);
+
+		// do single step while rsp <= base to find end of function (include all recursive calls)
+		while(regs.rip != ret_addr) {
+			ptrace(PTRACE_SINGLESTEP, child_pid, NULL, NULL);
+			ptrace(PTRACE_GETREGS, child_pid, 0, &regs); // update regs
+		}
+
+		// function finished
+		unsigned long ret_val = regs.rax;
+		printf("PRF:: run #%d returned with %lu\n",counter, ret_val);
+		counter++;
+
+		// put break point at function again
+		ptrace(PTRACE_POKETEXT, child_pid, (void*)addr, (void*)data_trap);
+
+		/* The child can continue running now */
+		ptrace(PTRACE_CONT, child_pid, 0, 0);
+
+		wait(&wait_status);
+	}
+	// remove break point
+	ptrace(PTRACE_POKETEXT, child_pid, (void*)addr, (void*)data);
+}
+
+int main(int argc, char* argv[])
+{
 	int err = 0;
 	unsigned long addr = find_symbol(argv[1], argv[2], &err);
 
-	if (err == 1)
-		printf("%s will be loaded to 0x%lx\n", argv[1], addr);
-	else if (err == -2)
-		printf("%s is not a global symbol! :(\n", argv[1]);
-	else if (err == -1)
-		printf("%s not found!\n", argv[1]);
-	else if (err == -3)
-		printf("%s not an executable! :(\n", argv[2]);
-	else if (err == -4)
-		printf("%s is a global symbol, but will come from a shared library at offset 0x%lx\n", argv[1], addr);
-	return 0;
+	if(err == -3) {
+		printf("PRF:: %s not an executable! :(\n", argv[2]);
+		return 0;
+	}
+
+    pid_t child_pid;
+
+    child_pid = run_target(argv);
+	
+	// run specific "debugger"
+	if(child_pid > 0)
+		run_debugger(child_pid, argv[1], argv[2]);
+
+    return 0;
 }
