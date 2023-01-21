@@ -93,7 +93,8 @@ int findSymbolEntry(Elf64_Ehdr *elf_header, Elf64_Sym *symbol_entry, char* exe_f
 
 Elf64_Addr findRelaPltFunc(Elf64_Ehdr *elf_header, char* exe_file_name, char *symbol_name) {
     Elf64_Sym* dynsym;
-    char* strtab;
+    char* shstrtab;
+	char* strtab;
     unsigned long symbol_index;
 
     // Open ELF
@@ -118,27 +119,31 @@ Elf64_Addr findRelaPltFunc(Elf64_Ehdr *elf_header, char* exe_file_name, char *sy
         // Check if the section is the dynsym section
         if (section_headers[i].sh_type == SHT_DYNSYM) {
             dynsym = (Elf64_Sym*)(file_memory + section_headers[i].sh_offset);
-            strtab = (char*)(file_memory + section_headers[elf_header->e_shstrndx].sh_offset);
+            shstrtab = (char*)(file_memory + section_headers[elf_header->e_shstrndx].sh_offset);
+			strtab = (char*)(file_memory + section_headers[section_headers[i].sh_link].sh_offset);
             break;
         }
     }
     
 	// Iterate through the section headers to find 
 	Elf64_Rela* rela_plt;
+	int rela_idx = 0;
     for (int i = 0; i < elf_header->e_shnum; i++) {
         // Check  if the section is the .rela.plt section
-        if (strcmp(".rela.plt", strtab + section_headers[i].sh_name) == 0) {
+        if (strcmp(".rela.plt", shstrtab + section_headers[i].sh_name) == 0) {
             rela_plt = (Elf64_Rela*)(file_memory + section_headers[i].sh_offset);
+			rela_idx = i;
             break;
         }
     }
     
 	// Iterate through the relocations
 	Elf64_Addr func_addr;
-    for (int i = 0; i < section_headers[i].sh_size / sizeof(Elf64_Rela); i++) {
+    for (int i = 0; i < section_headers[rela_idx].sh_size / sizeof(Elf64_Rela); i++) {
         // Get the symbol index from the relocation entry
         symbol_index = ELF64_R_SYM(rela_plt[i].r_info);
         // Lookup the symbol name in the dynsym table
+		char *name = strtab + dynsym[symbol_index].st_name;
         if(strcmp(symbol_name, strtab + dynsym[symbol_index].st_name) == 0) {
             func_addr = rela_plt[i].r_offset;
             break;
@@ -197,7 +202,7 @@ pid_t run_target(char* argv[])
 		}
 		/* Replace this process's image with the given program */
 		execv(argv[2], argv + 2);	
-	} 
+	}
 	return 0;
 }
 
@@ -212,7 +217,8 @@ void run_debugger(pid_t child_pid, char *symbol_name, char *exec_name)
     wait(&wait_status);
 
     /* find symbol address we're interested in */
-    unsigned long addr = find_symbol(symbol_name, exec_name, &err);
+    unsigned long func_addr = find_symbol(symbol_name, exec_name, &err);
+	unsigned long got_addr = func_addr;
 	if (err == -2) {
 		printf("PRF:: %s is not a global symbol! :(\n", symbol_name);
 		return;
@@ -221,10 +227,14 @@ void run_debugger(pid_t child_pid, char *symbol_name, char *exec_name)
 		printf("PRF:: %s not found!\n", symbol_name);
 		return;
 	}
-	unsigned long data = ptrace(PTRACE_PEEKTEXT, child_pid, (void*)addr, NULL);
+	else if(err == -4){
+		func_addr = ptrace(PTRACE_PEEKTEXT, child_pid, (void*)func_addr, NULL);
+	}
+
+	unsigned long data = ptrace(PTRACE_PEEKTEXT, child_pid, (void*)func_addr, NULL);
 	unsigned long data_trap = (data & 0xFFFFFFFFFFFFFF00) | 0xCC;
 	// put break point at function
-	ptrace(PTRACE_POKETEXT, child_pid, (void*)addr, (void*)data_trap);
+	ptrace(PTRACE_POKETEXT, child_pid, (void*)func_addr, (void*)data_trap);
 
 	/* Let the child run to the breakpoint and wait for it to reach it */
 	ptrace(PTRACE_CONT, child_pid, NULL, NULL);
@@ -235,25 +245,41 @@ void run_debugger(pid_t child_pid, char *symbol_name, char *exec_name)
 		ptrace(PTRACE_GETREGS, child_pid, 0, &regs);
 
 		/* Remove the breakpoint by restoring the previous data */
-		ptrace(PTRACE_POKETEXT, child_pid, (void*)addr, (void*)data);
+		ptrace(PTRACE_POKETEXT, child_pid, (void*)func_addr, (void*)data);
 		regs.rip -= 1;
 		ptrace(PTRACE_SETREGS, child_pid, 0, &regs);
-		// unsigned long base = regs.rsp;
-		unsigned long ret_addr = ptrace(PTRACE_PEEKTEXT, child_pid, (void*)(regs.rsp + 0x8), NULL);
+		
+		// return address of the function that is at the top of the stack
+		long ret_addr = ptrace(PTRACE_PEEKTEXT, child_pid, regs.rsp, NULL);
 
-		// do single step while rsp <= base to find end of function (include all recursive calls)
-		while(regs.rip != ret_addr) {
-			ptrace(PTRACE_SINGLESTEP, child_pid, NULL, NULL);
-			ptrace(PTRACE_GETREGS, child_pid, 0, &regs); // update regs
-		}
+		// Place breakpoint at the return address
+		long ret = ptrace(PTRACE_PEEKTEXT, child_pid, (void*)ret_addr, NULL);
+		long ret_trap = (ret & 0xFFFFFFFFFFFFFF00) | 0xCC;
+		ptrace(PTRACE_POKETEXT, child_pid, (void*)ret_addr, (void*)ret_trap);
+
+		// run function and recursive calls
+		ptrace(PTRACE_CONT, child_pid, NULL, NULL);
+		wait(&wait_status);
 
 		// function finished
-		unsigned long ret_val = regs.rax;
-		printf("PRF:: run #%d returned with %lu\n",counter, ret_val);
+		ptrace(PTRACE_GETREGS, child_pid, 0, &regs);
+		int ret_val = (int)regs.rax;
+		printf("PRF:: run #%d returned with %d\n",counter, ret_val);
 		counter++;
 
+		/* Remove the return addres breakpoint*/
+		ptrace(PTRACE_POKETEXT, child_pid, (void*)ret_addr, (void*)ret);
+		regs.rip -= 1;
+		ptrace(PTRACE_SETREGS, child_pid, 0, &regs);
+
+		if(err == -4) { // update addr after GOT has the function addr
+			func_addr = ptrace(PTRACE_PEEKTEXT, child_pid, (void*)got_addr, NULL);
+			data = ptrace(PTRACE_PEEKTEXT, child_pid, (void*)func_addr, NULL);
+			data_trap = (data & 0xFFFFFFFFFFFFFF00) | 0xCC;
+		}
+
 		// put break point at function again
-		ptrace(PTRACE_POKETEXT, child_pid, (void*)addr, (void*)data_trap);
+		ptrace(PTRACE_POKETEXT, child_pid, (void*)func_addr, (void*)data_trap);
 
 		/* The child can continue running now */
 		ptrace(PTRACE_CONT, child_pid, 0, 0);
@@ -261,7 +287,7 @@ void run_debugger(pid_t child_pid, char *symbol_name, char *exec_name)
 		wait(&wait_status);
 	}
 	// remove break point
-	ptrace(PTRACE_POKETEXT, child_pid, (void*)addr, (void*)data);
+	ptrace(PTRACE_POKETEXT, child_pid, (void*)func_addr, (void*)data);
 }
 
 int main(int argc, char* argv[])
