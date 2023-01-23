@@ -212,6 +212,10 @@ void run_debugger(pid_t child_pid, char *symbol_name, char *exec_name)
     struct user_regs_struct regs;
 	int counter = 1;
 	int err = 1;
+	unsigned long long base = 0;
+	long ret_addr = -1;
+	long ret = -1;
+	long ret_trap = -1;
 
     /* Wait for child to stop on its first instruction */
     wait(&wait_status);
@@ -250,11 +254,14 @@ void run_debugger(pid_t child_pid, char *symbol_name, char *exec_name)
 		ptrace(PTRACE_SETREGS, child_pid, 0, &regs);
 		
 		// return address of the function that is at the top of the stack
-		long ret_addr = ptrace(PTRACE_PEEKTEXT, child_pid, regs.rsp, NULL);
+		if(base == 0) {
+			base = regs.rsp;
+			ret_addr = ptrace(PTRACE_PEEKTEXT, child_pid, regs.rsp, NULL);
 
-		// Place breakpoint at the return address
-		long ret = ptrace(PTRACE_PEEKTEXT, child_pid, (void*)ret_addr, NULL);
-		long ret_trap = (ret & 0xFFFFFFFFFFFFFF00) | 0xCC;
+			// Place breakpoint at the return address
+			ret = ptrace(PTRACE_PEEKTEXT, child_pid, (void*)ret_addr, NULL);
+			ret_trap = (ret & 0xFFFFFFFFFFFFFF00) | 0xCC;
+		}
 		ptrace(PTRACE_POKETEXT, child_pid, (void*)ret_addr, (void*)ret_trap);
 
 		// run function and recursive calls
@@ -263,14 +270,23 @@ void run_debugger(pid_t child_pid, char *symbol_name, char *exec_name)
 
 		// function finished
 		ptrace(PTRACE_GETREGS, child_pid, 0, &regs);
-		int ret_val = (int)regs.rax;
-		printf("PRF:: run #%d returned with %d\n",counter, ret_val);
-		counter++;
-
 		/* Remove the return addres breakpoint*/
 		ptrace(PTRACE_POKETEXT, child_pid, (void*)ret_addr, (void*)ret);
 		regs.rip -= 1;
-		ptrace(PTRACE_SETREGS, child_pid, 0, &regs);
+
+		if(base < regs.rsp){
+			int ret_val = (int)regs.rax;
+			printf("PRF:: run #%d returned with %d\n",counter, ret_val);
+			counter++;
+			base = 0;
+			ptrace(PTRACE_SETREGS, child_pid, 0, &regs);
+		}
+		else {
+			ptrace(PTRACE_SETREGS, child_pid, 0, &regs);
+			ptrace(PTRACE_SINGLESTEP, child_pid, NULL, NULL);
+			ptrace(PTRACE_POKETEXT, child_pid, (void*)ret_addr, (void*)ret_trap);
+		}
+
 
 		if(err == -4) { // update addr after GOT has the function addr
 			func_addr = ptrace(PTRACE_PEEKTEXT, child_pid, (void*)got_addr, NULL);
