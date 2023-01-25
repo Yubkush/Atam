@@ -284,6 +284,7 @@ void run_debugger(pid_t child_pid, char *symbol_name, char *exec_name)
 		else {
 			ptrace(PTRACE_SETREGS, child_pid, 0, &regs);
 			ptrace(PTRACE_SINGLESTEP, child_pid, NULL, NULL);
+			wait(&wait_status);
 			ptrace(PTRACE_POKETEXT, child_pid, (void*)ret_addr, (void*)ret_trap);
 		}
 
